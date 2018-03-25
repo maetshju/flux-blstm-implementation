@@ -1,3 +1,14 @@
+# blstm.jl
+# 
+# An implementation of the bidirectional LSTM neural net for
+# speech recognition, as defind by Graves & Schmidhuber (2005).
+# [[NEED FULL CITATION]].
+# 
+# Julia implementation copyright Matthew C. Kelley, 2018
+# 
+# This software is licensed under the MIT license.
+# [[THIS MIGHT NOT BE DOABLE; CHECK JULIA AND FLUX LICENSES]]
+
 using Flux
 using Flux: crossentropy, softmax, throttle, flip
 using JLD
@@ -6,41 +17,22 @@ traindir = "train"
 
 forward = LSTM(26, 93)
 backward = LSTM(26, 93)
-# output = Dense(186, 61)
 
-blstm(x1, xn) = vcat(forward(x1), backward(xn))
+BLSTM(x) = vcat(forward(x[1]), backward(x[2]))
 
-# function model(xs)
-#     x1, xn = xs
-# #     Flux.reset!((forward, backward))
-#     softmax(output(blstm(x1, xn)))
-# #     yhat = softmax.(output.(blstm(x)))
-# #     return yhat
+# function BLSTM(n_in, n_out)
+#     x -> vcat(forward(x[1]), backward(x[2]))
 # end
 
-function BLSTM(n_in, n_out)
-#     forward = LSTM(26, 93)
-#     backward = LSTM(26, 93)
-    x -> vcat(forward(x[1]), backward(x[2]))
-end
-
 model = Chain(
-    BLSTM(26, 93),
+    BLSTM,
     Dense(186, 61),
     softmax
 )
 
-# model = Chain(
-#     Dense(26, 93),
-#     Dense(93, 61),
-#     softmax
-# )
-
 function loss(x, y)
     l = sum(crossentropy.(model.(collect(zip(x, reverse(x)))), y))
     Flux.reset!((forward, backward))
-#     println(l / size(x,1))
-#     Flux.reset!((forward, backward))
     return l
 end
 
@@ -67,45 +59,31 @@ data = collect(zip(Xs, Ys))
 val_data = data[1:184]
 data = data[184:length(data)]
 
-function get_prediction(y)
-        mx = 0
-        loc = 0
-        for (i, value) in enumerate(y)
-            if value > mx
-                mx = value
-                loc = i
-            end
-        end
-        return loc
+predict(x) = model.(collect(zip(x, reverse(x))))
+
+function evaluate_accuracy(data)
+    correct = Vector()
+    for (x, y) in data
+        y = indmax.(y)
+        yhat = indmax.(predict(x))
+        correct = vcat(correct, [yhat1 == y1 for (yhat1, y1) in zip(yhat, y)])
     end
+    sum(correct) / length(correct)
+end
 
 println("Beginning training")
 
 epochs = 1
+
 for i in 1:epochs
 
     println("Epoch " * string(i) * "\t")
     data = data[shuffle(1:length(data))]
     
     Flux.train!(loss, data, opt)
-    
-    val_predictions = Vector()
-    val_correct = Vector()
+    val_acc = evaluate_accuracy(val_data)
 
-    println("Validating")
-    for (x, y) in val_data
-        utterancepredictions = model.(collect(zip(x, reverse(x))))
-        utterance_correct = Vector()
-        for (yhat, y_single) in zip(utterancepredictions, y)
-            yhat = indmax(yhat) # COULD USE INDMAX HERE?
-            y_single = get_prediction(y_single)
-            push!(utterance_correct, yhat == y_single)
-        end
-        val_predictions = vcat(val_predictions, utterancepredictions)
-        val_correct = vcat(val_correct, utterance_correct)
-    end
-
-    println("Val acc. " * string(sum(val_correct) / length(val_correct)))
-
+    print("Validating\r")
+    println("Val acc. " * string(val_acc))
     println()
 end
