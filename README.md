@@ -1,4 +1,4 @@
-This is an implementation of the bidirectional LSTM network as defined by Graves & Schmidhuber (2005).
+This is an implementation of the bidirectional LSTM network for speech recognition as defined by Graves & Schmidhuber (2005). It's defined in the Flux machine learning library for the Julia programming language.
 
 # References
 
