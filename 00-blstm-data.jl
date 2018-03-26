@@ -23,16 +23,18 @@ frame_interval = 0.01 # 10 ms
 phones = split("h#	q	eh	dx	iy	r	ey	ix	tcl	sh	ow	z	s	hh	aw	m	t	er	l	w	aa	hv	ae	dcl	y	axr	d	kcl	k	ux	ng	gcl	g	ao	epi	ih	p	ay	v	n	f	jh	ax	en	oy	dh	pcl	ah	bcl	el	zh	uw	pau	b	uh	th	ax-h	em	ch	nx	eng")
 phone_translations = Dict(phone=>i for (i, phone) in enumerate(phones))
 
+"""
+    make_data(phn_fname, wav_fname)
+Process a TIMIT WAV file into MFCC windows, labeled based on the PHN file.
+
+# Parameters:
+* **phn_fname** String of the PHN file name
+* **wav_fname** String of the WAV file name
+    
+# Returns
+* A tuple containing a vector of frames and a vector of labels
+"""
 function make_data(phn_fname, wav_fname)
-    # Process a TIMIT WAV file into MFCC windows, labeled
-    # based on the PHN file.
-    #
-    # Parameters:
-    #   phn_fname String of the PHN file name
-    #   wav_fname String of the WAV file name
-    #
-    # Returns a tuple containing a vector of frames and
-    # a vector of labels
 
     # Read in WAV file and process into MFCCs and deltas
     samps, sr = wavread(wav_fname)
@@ -92,6 +94,15 @@ function make_data(phn_fname, wav_fname)
     (features, seq)
 end
 
+"""
+    create_data(data_dir, out_dir)
+
+Pre-processes the TIMIT data and writes it to the appropriate directories.
+
+# Parameters
+* **data_dir** The directory containing the data to pre-process
+* **out_dir** The directory to write the pre-processed data to
+"""
 function create_data(data_dir, out_dir)
     for (root, dirs, files) in walkdir(data_dir)
         phn_fnames = [fname for fname in files if contains(fname, "PHN")]
