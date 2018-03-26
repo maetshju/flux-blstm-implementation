@@ -78,7 +78,7 @@ function read_data(data_dir)
     
     for (i, fname) in enumerate(fnames)
         print(string(i) * "/" * string(length(fnames)) * "\r")
-        x, y = load(joinpath(traindir, fname), "x", "y")
+        x, y = load(joinpath(data_dir, fname), "x", "y")
         x = [x[i,:] for i in 1:size(x,1)]
         y = [y[i,:] for i in 1:size(y,1)]
         push!(Xs, x)
@@ -99,8 +99,9 @@ function predict(x)
     #
     # Side effects
     #   Resets the state in the BLSTM layer
-    model.(collect(zip(x, reverse(x))))
+    ŷ = model.(collect(zip(x, reverse(x))))
     Flux.reset!((forward, backward))
+    return ŷ
 end
 
 function evaluate_accuracy(data)
@@ -145,16 +146,24 @@ for i in 1:epochs
     data = data[shuffle(1:length(data))]
     
     Flux.train!(loss, data, opt)
-    val_acc = evaluate_accuracy(val_data)
 
     print("Validating\r")
+    val_acc = evaluate_accuracy(val_data)
     println("Val acc. " * string(val_acc))
     println()
 end
 
-# Test data
-test_data = collect(zip(read_data(testdir)))
+# Clearn up some memory
+val_data = 0
+data = 0
+Xs = 0
+Ys = 0
+gc()
+
+# Test model
 print("Testing\r")
+Xs_test, Ys_test = read_data(testdir)
+test_data = collect(zip(Xs_test, Ys_test))
 test_acc = evaluate_accuracy(test_data)
 println("Test acc. " * string(test_acc))
 println()

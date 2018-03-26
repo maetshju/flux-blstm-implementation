@@ -100,7 +100,7 @@ function create_data(data_dir, out_dir)
             x, y = make_data(phn_path, wav_path)
             
             y = [phone_translations[Y] for Y in y]
-            class_nums = [x for x in 1:61]
+            class_nums = [n for n in 1:61]
             y = onehotbatch(y, class_nums)'
             
             base = splitext(phn_fname)[1]
@@ -112,4 +112,4 @@ function create_data(data_dir, out_dir)
 end
 
 create_data(training_data_dir, training_out_dir)
-create_data)test_data_dir, test_out_dir)
+create_data(test_data_dir, test_out_dir)
