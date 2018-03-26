@@ -1,4 +1,4 @@
-# blstm.jl
+# 01-blstm.jl
 # 
 # Julia implementation Copyright (c) 2018 Matthew C. Kelley
 # 
