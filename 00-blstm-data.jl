@@ -25,7 +25,8 @@ phone_translations = Dict(phone=>i for (i, phone) in enumerate(phones))
 
 """
     make_data(phn_fname, wav_fname)
-Process a TIMIT WAV file into MFCC windows, labeled based on the PHN file.
+Process a TIMIT WAV file into MFCC windows, labeled based on the
+PHN file.
 
 # Parameters:
 * **phn_fname** String of the PHN file name
@@ -97,7 +98,8 @@ end
 """
     create_data(data_dir, out_dir)
 
-Pre-processes the TIMIT data and writes it to the appropriate directories.
+Pre-processes the TIMIT data and writes it to the appropriate
+directories.
 
 # Parameters
 * **data_dir** The directory containing the data to pre-process

@@ -26,9 +26,12 @@ backward = LSTM(26, 93)
 BLSTM layer using above LSTM layers
     
 # Parameters
-* **x** A 2-tuple containing the forward and backward time samples; the first is from processing the sequence forward, and the second is from processing it backward
+* **x** A 2-tuple containing the forward and backward time samples;
+the first is from processing the sequence forward, and the second
+is from processing it backward
     
-* Returns The concatenation of the forward and backward LSTM predictions
+* Returns The concatenation of the forward and backward LSTM
+predictions
 """
 BLSTM(x) = sigmoid.(vcat(forward(x[1]), backward(x[2])))
 
@@ -47,7 +50,8 @@ Calculates the categorical cross-entropy loss for an utterance
     
 # Parameters
 * **x** Iterable containing the frames to classify
-* **y** Iterable containing the labels corresponding to the frames in `x`
+* **y** Iterable containing the labels corresponding to the frames
+in `x`
     
 # Returns
 * The calculated loss value
@@ -70,8 +74,10 @@ Reads in the data contained in a specified directory
 * **data_dir** String of the path to the directory containing the data
     
 # Return
-* **Xs** Vector where each element is a vector of the frames for one utterance
-* **Ys** A vector where each element is a vector of the labels for the frames for one utterance
+* **Xs** Vector where each element is a vector of the frames for
+one utterance
+* **Ys** A vector where each element is a vector of the labels for
+the frames for one utterance
 """
 function read_data(data_dir)
     fnames = readdir(data_dir)
@@ -114,13 +120,17 @@ end
 """
     evaluate_accuracy(data)
 
-Evaluates the accuracy of the model on a set of data; can be used either for validation or test accuracy
+Evaluates the accuracy of the model on a set of data; can be used
+either for validation or test accuracy
 
 # Parameters
-* **data** An iterable of paired values where the first element is all the frames for a single utterance, and the second is the associated frame labels to compare the model's predictions against
+* **data** An iterable of paired values where the first element is
+all the frames for a single utterance, and the second is the
+associated frame labels to compare the model's predictions against
 
 # Returns
-* The predicted accuracy value as a proportion of the number of correct predictions over the total number of predictions made
+* The predicted accuracy value as a proportion of the number of
+correct predictions over the total number of predictions made
 """
 function evaluate_accuracy(data)
     correct = Vector()
