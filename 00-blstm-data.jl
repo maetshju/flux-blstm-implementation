@@ -1,3 +1,9 @@
+# 00-blstm-data.jl
+#
+# Julia implementation Copyright (c) 2018 Matthew C. Kelley
+#
+# Script to pre-process TIMIT data for use in the neural network.
+
 using Flux: onehotbatch
 using WAV
 using MFCC

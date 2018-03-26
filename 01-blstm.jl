@@ -1,13 +1,12 @@
 # blstm.jl
 # 
+# Julia implementation Copyright (c) 2018 Matthew C. Kelley
+# 
 # An implementation of the bidirectional LSTM neural net for
-# speech recognition defind by Graves & Schmidhuber (2005).
-# [[NEED FULL CITATION]].
-# 
-# Julia implementation copyright Matthew C. Kelley, 2018
-# 
-# This software is licensed under the MIT license.
-# [[THIS MIGHT NOT BE DOABLE; CHECK JULIA AND FLUX LICENSES]]
+# speech recognition defind by Graves & Schmidhuber ([Graves, A., &
+# Schmidhuber, J. (2005). Framewise phoneme classification with
+# bidirectional LSTM and other neural network architectures. Neural
+# Networks, 18(5-6), 602-610.]).
 
 using Flux
 using Flux: crossentropy, softmax, throttle, flip, sigmoid
