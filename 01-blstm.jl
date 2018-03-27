@@ -9,14 +9,14 @@
 # Networks, 18(5-6), 602-610.]).
 
 using Flux
-using Flux: crossentropy, softmax, throttle, flip, sigmoid
+using Flux: crossentropy, softmax, flip, sigmoid, LSTM
 using JLD
 
 # Paths to the training and test data directories
 traindir = "train"
 testdir = "test"
 
-# Component layers of the bidirectional LSTM layers
+# Component layers of the bidirectional LSTM layer
 forward = LSTM(26, 93)
 backward = LSTM(26, 93)
 
@@ -30,8 +30,8 @@ BLSTM layer using above LSTM layers
 the first is from processing the sequence forward, and the second
 is from processing it backward
     
-* Returns The concatenation of the forward and backward LSTM
-predictions
+# Returns
+* The concatenation of the forward and backward LSTM predictions
 """
 BLSTM(x) = sigmoid.(vcat(forward(x[1]), backward(x[2])))
 
@@ -109,7 +109,7 @@ Make predictions on the data using the model defined above
 * The predicted scores for each phoneme class for each frame in `x`
 
 # Side effects
-* Resets the state in the BLSTM layer
+* Resets the state in the BLSTM layer after making predictions
 """
 function predict(x)
     ŷ = model.(collect(zip(x, reverse(x))))
@@ -149,17 +149,18 @@ data = collect(zip(Xs, Ys))
 
 # Move 5% (184 files) of the TIMIT data into a validation set
 val_data = data[1:184]
-data = data[184:length(data)]
+data = data[185:length(data)]
 
 # Begin training
 println("Beginning training")
 
-opt = SGD(params(model), 10.0^-5)
+opt = Momentum(params(model), 10.0^-5; ρ=0.9)
 epochs = 1
 
 for i in 1:epochs
     println("Epoch " * string(i) * "\t")
     data = data[shuffle(1:length(data))]
+    val_data = data[shuffle(1:length(val_data))]
     
     Flux.train!(loss, data, opt)
 
