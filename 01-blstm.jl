@@ -171,7 +171,7 @@ epochs = 20
 for i in 1:epochs
     println("Epoch " * string(i) * "/" * string(epochs))
     data = data[shuffle(1:length(data))]
-#     val_data = val_data[shuffle(1:length(val_data))]
+    val_data = val_data[shuffle(1:length(val_data))]
     
     Flux.train!(loss, data, opt)
 
