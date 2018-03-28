@@ -169,7 +169,7 @@ opt = Momentum(params((forward, backward, output)), 10.0^-5; ρ=0.9)
 epochs = 20
 
 for i in 1:epochs
-    println("Epoch " * string(i) * "\t")
+    println("Epoch " * string(i) * "/" * string(epochs))
     data = data[shuffle(1:length(data))]
 #     val_data = val_data[shuffle(1:length(val_data))]
     
