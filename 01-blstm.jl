@@ -6,7 +6,12 @@
 # speech recognition defind by Graves & Schmidhuber ([Graves, A., &
 # Schmidhuber, J. (2005). Framewise phoneme classification with
 # bidirectional LSTM and other neural network architectures. Neural
-# Networks, 18(5-6), 602-610.]).
+# Networks, 18(5-6), 602-610.]). The best results the authors report
+# is after training this network using a weighted error function, then
+# retraining it for 17 epochs with the categorical cross entropy
+# error function. The present implementation is of their network that
+# does not use retraining, for which the best results were found for
+# training for around 20 epochs.
 
 using Flux
 using Flux: crossentropy, softmax, flip, sigmoid, LSTM
@@ -19,6 +24,7 @@ testdir = "test"
 # Component layers of the bidirectional LSTM layer
 forward = LSTM(26, 93)
 backward = LSTM(26, 93)
+output = Dense(186, 61)
 
 """
     BLSTM(x)
@@ -33,15 +39,9 @@ is from processing it backward
 # Returns
 * The concatenation of the forward and backward LSTM predictions
 """
-BLSTM(x) = sigmoid.(vcat(forward(x[1]), backward(x[2])))
+BLSTM(x) = vcat.(forward.(x), flip(backward, x))
 
-# The model that is used for predicitons; consists of the
-# BLSTM layer and and output layer 
-model = Chain(
-    BLSTM,
-    Dense(186, 61),
-    softmax
-)
+model(x) = softmax.(output.(BLSTM(x)))
 
 """
    loss(x, y)
@@ -60,7 +60,7 @@ in `x`
 * Resets the state in the BLSTM layer
 """
 function loss(x, y)
-    l = sum(crossentropy.(model.(collect(zip(x, reverse(x)))), y))
+    l = sum(crossentropy.(model(x), y))
     Flux.reset!((forward, backward))
     return l
 end
@@ -112,7 +112,7 @@ Make predictions on the data using the model defined above
 * Resets the state in the BLSTM layer after making predictions
 """
 function predict(x)
-    ŷ = model.(collect(zip(x, reverse(x))))
+    ŷ = model(x)
     Flux.reset!((forward, backward))
     return ŷ
 end
@@ -154,13 +154,13 @@ data = data[185:length(data)]
 # Begin training
 println("Beginning training")
 
-opt = Momentum(params(model), 10.0^-5; ρ=0.9)
-epochs = 1
+opt = Momentum(params((forward, backward, output)), 10.0^-5; ρ=0.9)
+epochs = 20
 
 for i in 1:epochs
     println("Epoch " * string(i) * "\t")
     data = data[shuffle(1:length(data))]
-    val_data = data[shuffle(1:length(val_data))]
+#     val_data = val_data[shuffle(1:length(val_data))]
     
     Flux.train!(loss, data, opt)
 
