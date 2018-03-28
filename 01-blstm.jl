@@ -41,6 +41,17 @@ is from processing it backward
 """
 BLSTM(x) = vcat.(forward.(x), flip(backward, x))
 
+"""
+    model(x)
+
+The chain of functions representing the trained model.
+
+# Parameters
+* **x** The utterance that the model should process
+
+# Returns
+* The model's predictions for each time step in `x`
+"""
 model(x) = softmax.(output.(BLSTM(x)))
 
 """
