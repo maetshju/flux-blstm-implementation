@@ -120,7 +120,7 @@ function create_data(data_dir, out_dir)
             
             y = [phone_translations[Y] for Y in y]
             class_nums = [n for n in 1:61]
-            y = onehotbatch(y, class_nums)'
+            y = onehotbatch(y, class_nums)
             
             base = splitext(phn_fname)[1]
             dat_name = one_dir_up * base * ".jld"
